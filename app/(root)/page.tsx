@@ -5,47 +5,18 @@ import QueueStatus from "../../components/QueueStatus";
 import BedAvailability from "../../components/BedAvailability";
 import dynamic from 'next/dynamic';
 
+// Dynamically import HospCard component
 const HospCard = dynamic(() => import('../../components/HospCard'), {
   ssr: false
 });
 
-const Page = () => {
+const Page: React.FC = () => {
   const patientQueue = [
-    {
-      id: "P001",
-      name: "John Doe",
-      age: 45,
-      condition: "Chest Pain",
-      waitTime: "20 mins"
-    },
-    {
-      id: "P002",
-      name: "Jane Smith",
-      age: 32,
-      condition: "Broken Arm",
-      waitTime: "35 mins"
-    },
-    {
-      id: "P003",
-      name: "Bob Johnson",
-      age: 58,
-      condition: "High Fever",
-      waitTime: "15 mins"
-    },
-    {
-      id: "P004",
-      name: "Alice Brown",
-      age: 27,
-      condition: "Allergic Reaction",
-      waitTime: "10 mins"
-    },
-    {
-      id: "P005",
-      name: "Charlie Davis",
-      age: 70,
-      condition: "Shortness of Breath",
-      waitTime: "5 mins"
-    }
+    { id: "P001", name: "John Doe", age: 45, condition: "Chest Pain", waitTime: "20 mins" },
+    { id: "P002", name: "Jane Smith", age: 32, condition: "Broken Arm", waitTime: "35 mins" },
+    { id: "P003", name: "Bob Johnson", age: 58, condition: "High Fever", waitTime: "15 mins" },
+    { id: "P004", name: "Alice Brown", age: 27, condition: "Allergic Reaction", waitTime: "10 mins" },
+    { id: "P005", name: "Charlie Davis", age: 70, condition: "Shortness of Breath", waitTime: "5 mins" }
   ];
 
   const queueStatuses = [
@@ -74,21 +45,49 @@ const Page = () => {
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-4">
         <HospCard />
-        
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="md:col-span-2">
-            <PatientQueue patientQueue={patientQueue} />
+
+        {/* Grid Layout for Patient Queue and Doctor Availability */}
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 h-full">
+          {/* Left: Patient Queue (2/3 of width) */}
+          <div className="lg:col-span-2 flex flex-col h-full">
+            <div className="flex-grow p-4 bg-white rounded-lg shadow-md h-full">
+              <PatientQueue patientQueue={patientQueue} />
+            </div>
           </div>
-          <div className="md:col-span-1">
-            <DoctorAvailability doctorAvailability={doctorAvailability} />
+
+          {/* Right: Doctor Availability (1/3 of width) */}
+          <div className="lg:col-span-1 flex flex-col h-full">
+            <div className="flex-grow p-4 bg-white rounded-lg shadow-md h-full">
+              <DoctorAvailability doctorAvailability={doctorAvailability} />
+            </div>
           </div>
         </div>
-        
-        <QueueStatus queueStatuses={queueStatuses} />
-        <BedAvailability bedAvailability={bedAvailability} />
+
+        {/* Queue Statuses */}
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+          {/* Column 1: Emergency, Urgent Care, General Consultation */}
+          <div className="space-y-4">
+            <QueueStatus queueStatuses={queueStatuses.filter(
+              status => ["Emergency", "Urgent Care", "General Consultation"].includes(status.name)
+            )} />
+          </div>
+
+          {/* Column 2: Pharmacy, Laboratory */}
+          <div className="space-y-4">
+            <QueueStatus queueStatuses={queueStatuses.filter(
+              status => ["Pharmacy", "Laboratory"].includes(status.name)
+            )} />
+          </div>
+        </div>
+
+        {/* Bed Availability */}
+        <div>
+          <BedAvailability bedAvailability={bedAvailability} />
+        </div>
       </div>
     </div>
   );
 };
 
+// Ensure the page is exported as a default export
 export default Page;
